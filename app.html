@@ -1,0 +1,249 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ErrandRoute - order your errands so nothing closes before you arrive</title>
+<meta name="description" content="Bank closes at 2, post office at 5, pharmacy at 6. ErrandRoute finds the stop order that gets it all done, and tells you when a day just can't work.">
+<style>
+:root{--bg:#0e1420;--card:#17202e;--line:#26334a;--ink:#e8eef5;--dim:#9fb0c3;--acc:#ffb454;--acc2:#5ec8e0;--bad:#ff6b6b;--good:#6fd08c}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:760px;margin:0 auto;padding:22px 14px 60px}
+h1{font-size:1.7rem;margin:6px 0 2px}h1 .a{color:var(--acc)}
+.tag{color:var(--dim);margin:0 0 14px}
+.note{background:#231a10;border:1px solid #4d3a1a;color:#ffd9a0;padding:9px 12px;border-radius:10px;font-size:.9rem;margin:12px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+label{font-size:.82rem;color:var(--dim);display:block;margin:8px 0 3px}
+input,select,textarea{background:#0e1622;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 9px;font:inherit;width:100%}
+input[type=checkbox]{width:auto}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>div{flex:1;min-width:88px}
+button{background:var(--acc);border:0;color:#1a1206;font-weight:700;border-radius:9px;padding:10px 16px;font:inherit;cursor:pointer}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);font-weight:400;padding:8px 12px}
+button.small{padding:4px 10px;font-size:.85rem}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{color:var(--dim);font-weight:600;text-align:left;padding:4px 6px;font-size:.78rem}
+td{padding:3px 4px}td input{padding:6px 7px}
+.badge{display:inline-block;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:700}
+.badge.exact{background:#123626;color:var(--good);border:1px solid #2a5c40}
+.badge.heur{background:#2a2410;color:var(--acc);border:1px solid #54451c}
+.badge.late{background:#3a1414;color:var(--bad);border:1px solid #5c2424}
+.itin{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.stop{display:flex;gap:10px;align-items:flex-start;background:#101a28;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.stop .n{flex:0 0 26px;height:26px;border-radius:50%;background:var(--acc);color:#1a1206;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+.stop .nm{font-weight:700}.stop .tm{color:var(--dim);font-size:.85rem}
+.stop .late{color:var(--bad);font-size:.82rem;font-weight:700}
+.tot{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;color:var(--dim);font-size:.92rem}
+.tot b{color:var(--ink)}
+.err{background:#3a1414;border:1px solid #5c2424;color:#ffc9c9;padding:10px 12px;border-radius:10px;margin:10px 0;font-size:.92rem;white-space:pre-wrap}
+a{color:var(--acc2)}#map{width:100%;border:1px solid var(--line);border-radius:10px;background:#0b111c;margin-top:10px}
+.tabs{display:flex;gap:8px;margin:10px 0}.tabs button{flex:1}
+.tabs button.on{background:var(--acc2);color:#06222a}
+</style></head><body><main>
+<h1>Errand<span class="a">Route</span></h1>
+<p class="tag">Post office closes at 5, bank at 2, pharmacy at 6. Guess the order and you lose an hour, or the errand. Put in your stops and closing times; get the order that makes the day work.</p>
+<div class="note">Honesty note: grid mode estimates road time as straight-line distance x a circuity factor (default 1.3) at your average speed. It is not live traffic. For real drive minutes, use matrix mode and paste times from your map app.</div>
+
+<div class="card">
+<div class="tabs">
+<button id="tabGrid" class="on" type="button">Grid mode (estimate)</button>
+<button id="tabMatrix" type="button">Matrix mode (exact minutes)</button>
+</div>
+<div id="gridPane">
+<div class="row">
+<div><label>Home x (miles)</label><input id="homeX" type="number" step="any" value="0"></div>
+<div><label>Home y (miles)</label><input id="homeY" type="number" step="any" value="0"></div>
+<div><label>Avg speed (mph)</label><input id="speed" type="number" step="any" value="22"></div>
+<div><label>Circuity factor</label><input id="circ" type="number" step="any" value="1.3"></div>
+</div>
+</div>
+<div id="matrixPane" style="display:none">
+<label>Drive minutes matrix: home first, then the stops in the order listed below. One row per line, numbers separated by spaces or commas.</label>
+<textarea id="matrix" rows="6" spellcheck="false" placeholder="0 12 25&#10;14 0 9&#10;27 8 0"></textarea>
+</div>
+<div class="row">
+<div><label>Leave home at</label><input id="depart" value="09:00"></div>
+<div style="display:flex;align-items:flex-end;padding-bottom:8px"><label style="margin:0"><input id="returnHome" type="checkbox" checked> come back home after</label></div>
+</div>
+</div>
+
+<div class="card">
+<table id="stopTable"><thead><tr>
+<th style="width:34%">Stop</th><th class="gx">x</th><th class="gx">y</th><th>Mins<br>there</th><th>Opens</th><th>Closes</th><th></th>
+</tr></thead><tbody id="stopRows"></tbody></table>
+<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+<button class="ghost small" id="addStop" type="button">+ add stop</button>
+<button class="ghost small" id="loadExample" type="button">load Saturday example</button>
+</div>
+</div>
+
+<button id="planBtn" type="button" style="width:100%">Plan my route</button>
+<div id="errors"></div>
+<div id="results"></div>
+<p style="margin-top:18px"><a href="index.html">About ErrandRoute</a></p>
+</main>
+<script src="engine.js"></script>
+<script>
+'use strict';
+var $ = function(id){ return document.getElementById(id); };
+var mode = 'grid';
+
+function esc(s){ return ErrandRoute.esc(s); }
+
+function setMode(m){
+  mode = m;
+  $('tabGrid').classList.toggle('on', m === 'grid');
+  $('tabMatrix').classList.toggle('on', m === 'matrix');
+  $('gridPane').style.display = m === 'grid' ? '' : 'none';
+  $('matrixPane').style.display = m === 'matrix' ? '' : 'none';
+  var gx = document.querySelectorAll('.gx');
+  for (var i = 0; i < gx.length; i++) gx[i].style.display = m === 'grid' ? '' : 'none';
+}
+$('tabGrid').onclick = function(){ setMode('grid'); };
+$('tabMatrix').onclick = function(){ setMode('matrix'); };
+
+function addRow(st){
+  st = st || {};
+  var tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td><input class="nm" maxlength="80" placeholder="name" value="' + esc(st.name || '') + '"></td>' +
+    '<td class="gx"><input class="x" type="number" step="any" value="' + (st.x !== undefined ? st.x : '') + '"></td>' +
+    '<td class="gx"><input class="y" type="number" step="any" value="' + (st.y !== undefined ? st.y : '') + '"></td>' +
+    '<td><input class="sv" type="number" min="0" max="600" value="' + (st.service !== undefined ? st.service : 10) + '"></td>' +
+    '<td><input class="ea" placeholder="--:--" size="5" value="' + esc(st.earliest || '') + '"></td>' +
+    '<td><input class="la" placeholder="--:--" size="5" value="' + esc(st.latest || '') + '"></td>' +
+    '<td><button class="ghost small rm" type="button" title="remove">x</button></td>';
+  tr.querySelector('.rm').onclick = function(){ tr.remove(); };
+  $('stopRows').appendChild(tr);
+  if (mode !== 'grid') {
+    var gx = tr.querySelectorAll('.gx');
+    for (var i = 0; i < gx.length; i++) gx[i].style.display = 'none';
+  }
+}
+$('addStop').onclick = function(){ addRow(); };
+
+var EXAMPLE = [
+  { name: 'bank', x: 2.2, y: 0.8, service: 15, latest: '14:00' },
+  { name: 'pharmacy', x: -1.5, y: 2.6, service: 10, latest: '18:00' },
+  { name: 'post office', x: 3.4, y: -1.2, service: 8, latest: '17:00' },
+  { name: 'hardware store', x: -3.8, y: -2.4, service: 20, earliest: '10:00', latest: '20:00' },
+  { name: 'grocery', x: 0.6, y: 3.1, service: 35, latest: '21:00' },
+  { name: 'dry cleaner', x: -2.2, y: 0.4, service: 5, latest: '13:00' }
+];
+$('loadExample').onclick = function(){
+  $('stopRows').innerHTML = '';
+  EXAMPLE.forEach(addRow);
+  $('depart').value = '09:30';
+  $('results').innerHTML = '';
+  $('errors').innerHTML = '';
+};
+
+function readStops(){
+  var rows = document.querySelectorAll('#stopRows tr'), stops = [];
+  for (var i = 0; i < rows.length; i++) {
+    var q = function(sel){ return rows[i].querySelector(sel).value; };
+    stops.push({
+      name: q('.nm'), x: q('.x'), y: q('.y'),
+      service: q('.sv') === '' ? 10 : Number(q('.sv')),
+      earliest: q('.ea'), latest: q('.la')
+    });
+  }
+  return stops;
+}
+
+function parseMatrix(text, n){
+  var lines = text.split(/\n/), rows = [];
+  for (var i = 0; i < lines.length; i++) {
+    var t = lines[i].trim();
+    if (!t) continue;
+    var parts = t.split(/[\s,]+/).filter(function(p){ return p !== ''; });
+    rows.push(parts.map(Number));
+  }
+  if (rows.length !== n) throw new Error('Matrix needs ' + n + ' rows (home + ' + (n - 1) + ' stops), got ' + rows.length + '.');
+  return rows;
+}
+
+function renderPlan(p){
+  var R = p.result, inp = p.input, html = '';
+  html += '<div class="card">';
+  html += '<span class="badge ' + (p.method === 'exact' ? 'exact' : 'heur') + '">' +
+    (p.method === 'exact' ? 'exact best order (all ' + fac(p.order.length) + ' orders checked)' : 'heuristic order (multi-start + 2-opt, 9+ stops)') + '</span> ';
+  if (!R.feasible) html += '<span class="badge late">something closes before you get there</span>';
+  html += '<div class="itin">';
+  for (var k = 0; k < R.schedule.length; k++) {
+    var sc = R.schedule[k], st = inp.stops[sc.stop];
+    html += '<div class="stop"><div class="n">' + (k + 1) + '</div><div>' +
+      '<div class="nm">' + esc(st.name) + '</div>' +
+      '<div class="tm">drive ' + Math.round(sc.drive) + ' min &middot; there ' + ErrandRoute.fmtHM(sc.arrive);
+    if (sc.begin > sc.arrive + 0.5) html += ' &middot; opens ' + ErrandRoute.fmtHM(sc.begin) + ' (wait ' + Math.round(sc.begin - sc.arrive) + ' min)';
+    html += ' &middot; done ' + ErrandRoute.fmtHM(sc.depart) + '</div>';
+    if (st.latest !== null) html += '<div class="tm">closes ' + ErrandRoute.fmtHM(st.latest) + '</div>';
+    if (sc.late > 0) html += '<div class="late">LATE by ' + Math.round(sc.late) + ' min - it closes before you get in</div>';
+    html += '</div></div>';
+  }
+  html += '</div><div class="tot">' +
+    '<span>total driving <b>' + Math.round(R.totalDrive) + ' min</b></span>' +
+    (inp.returnHome ? '<span>back home <b>' + ErrandRoute.fmtHM(R.finish) + '</b></span>'
+                    : '<span>finished <b>' + ErrandRoute.fmtHM(R.finish) + '</b></span>') +
+    '</div>';
+  if (p.savedLate > 0.5 || p.savedDrive > 0.5) {
+    html += '<div class="tot" style="color:var(--good)">vs the order you typed: ';
+    var bits = [];
+    if (p.savedLate > 0.5) bits.push('<b>' + Math.round(p.savedLate) + ' late min avoided</b>');
+    if (p.savedDrive > 0.5) bits.push('<b>' + Math.round(p.savedDrive) + ' drive min saved</b>');
+    html += bits.join(' + ') + '</div>';
+  }
+  if (inp.mode === 'grid') html += renderMap(p);
+  html += '</div>';
+  return html;
+}
+
+function fac(n){ var r = 1; for (var i = 2; i <= n; i++) r *= i; return r.toLocaleString('en-US'); }
+
+function renderMap(p){
+  var inp = p.input, pts = [{ x: inp.mode === 'grid' ? Number($('homeX').value) : 0, y: inp.mode === 'grid' ? Number($('homeY').value) : 0, home: true }];
+  for (var i = 0; i < inp.stops.length; i++) pts.push({ x: inp.stops[i].x, y: inp.stops[i].y });
+  var xs = pts.map(function(q){ return q.x; }), ys = pts.map(function(q){ return q.y; });
+  var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
+  var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+  var W = 720, H = 380, pad = 34;
+  var sx = (x1 - x0) < 1e-9 ? 1 : (W - 2 * pad) / (x1 - x0);
+  var sy = (y1 - y0) < 1e-9 ? 1 : (H - 2 * pad) / (y1 - y0);
+  var s = Math.min(sx, sy);
+  function px(x){ return pad + (x - x0) * s + (W - 2 * pad - (x1 - x0) * s) / 2; }
+  function py(y){ return H - pad - (y - y0) * s - (H - 2 * pad - (y1 - y0) * s) / 2; }
+  var route = [0].concat(p.order.map(function(i){ return i + 1; }));
+  if (inp.returnHome) route.push(0);
+  var svg = '<svg id="map" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="route map">';
+  svg += '<polyline fill="none" stroke="#5ec8e0" stroke-width="2" stroke-dasharray="5 4" points="';
+  svg += route.map(function(i){ return px(pts[i].x).toFixed(1) + ',' + py(pts[i].y).toFixed(1); }).join(' ') + '"/>';
+  for (var k = 0; k < p.order.length; k++) {
+    var idx = p.order[k] + 1;
+    svg += '<circle cx="' + px(pts[idx].x).toFixed(1) + '" cy="' + py(pts[idx].y).toFixed(1) + '" r="13" fill="#ffb454"/>' +
+      '<text x="' + px(pts[idx].x).toFixed(1) + '" y="' + (py(pts[idx].y) + 4).toFixed(1) + '" text-anchor="middle" font-size="12" font-weight="800" fill="#1a1206">' + (k + 1) + '</text>' +
+      '<text x="' + px(pts[idx].x).toFixed(1) + '" y="' + (py(pts[idx].y) - 19).toFixed(1) + '" text-anchor="middle" font-size="11" fill="#e8eef5">' + esc(inp.stops[p.order[k]].name) + '</text>';
+  }
+  svg += '<rect x="' + (px(pts[0].x) - 10).toFixed(1) + '" y="' + (py(pts[0].y) - 10).toFixed(1) + '" width="20" height="20" fill="#5ec8e0" rx="4"/>' +
+    '<text x="' + px(pts[0].x).toFixed(1) + '" y="' + (py(pts[0].y) - 16).toFixed(1) + '" text-anchor="middle" font-size="11" fill="#e8eef5">home</text>';
+  svg += '</svg>';
+  return svg;
+}
+
+$('planBtn').onclick = function(){
+  $('errors').innerHTML = ''; $('results').innerHTML = '';
+  try {
+    var stops = readStops();
+    var raw = {
+      mode: mode, depart: $('depart').value, returnHome: $('returnHome').checked, stops: stops
+    };
+    if (mode === 'grid') {
+      raw.home = { x: $('homeX').value, y: $('homeY').value };
+      raw.speedMph = $('speed').value; raw.circuity = $('circ').value;
+    } else {
+      raw.matrix = parseMatrix($('matrix').value, stops.length + 1);
+    }
+    var p = ErrandRoute.plan(raw);
+    $('results').innerHTML = renderPlan(p);
+    $('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    $('errors').innerHTML = '<div class="err">' + esc(e.message) + '</div>';
+  }
+};
+
+addRow(); addRow();
+</script></body></html>
