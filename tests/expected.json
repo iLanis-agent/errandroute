@@ -1,0 +1,1414 @@
+[
+ {
+  "id": "crafted-tight-window",
+  "raw": {
+   "depart": "09:00",
+   "home": {
+    "x": 0,
+    "y": 0
+   },
+   "returnHome": true,
+   "stops": [
+    {
+     "name": "near-shop",
+     "x": 1,
+     "y": 0,
+     "service": 10
+    },
+    {
+     "name": "far-pharmacy",
+     "x": 9,
+     "y": 0,
+     "service": 5,
+     "latest": "09:40"
+    },
+    {
+     "name": "mid-cafe",
+     "x": 5,
+     "y": 0,
+     "service": 5
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    2,
+    1,
+    0
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 63.81818181818181,
+   "feasible": true
+  }
+ },
+ {
+  "id": "crafted-early-wait",
+  "raw": {
+   "depart": "08:00",
+   "home": {
+    "x": 0,
+    "y": 0
+   },
+   "returnHome": false,
+   "stops": [
+    {
+     "name": "bakery",
+     "x": 2,
+     "y": 0,
+     "service": 5,
+     "earliest": "09:00"
+    },
+    {
+     "name": "kiosk",
+     "x": 0,
+     "y": 2,
+     "service": 5
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    0,
+    1
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 17.1189688968274,
+   "feasible": true
+  }
+ },
+ {
+  "id": "crafted-infeasible",
+  "raw": {
+   "depart": "16:00",
+   "home": {
+    "x": 0,
+    "y": 0
+   },
+   "returnHome": true,
+   "stops": [
+    {
+     "name": "bank",
+     "x": 6,
+     "y": 8,
+     "service": 20,
+     "latest": "16:30"
+    },
+    {
+     "name": "clinic",
+     "x": -6,
+     "y": -8,
+     "service": 15,
+     "latest": "17:00"
+    },
+    {
+     "name": "market",
+     "x": 1,
+     "y": 1,
+     "service": 25
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "totalLate": 71.81818181818198,
+   "totalDrive": 151.8020677019286,
+   "feasible": false
+  }
+ },
+ {
+  "id": "crafted-triangle",
+  "raw": {
+   "depart": "10:00",
+   "home": {
+    "x": 0,
+    "y": 0
+   },
+   "returnHome": true,
+   "circuity": 1.0,
+   "speedMph": 30,
+   "stops": [
+    {
+     "name": "a",
+     "x": 3,
+     "y": 0,
+     "service": 0
+    },
+    {
+     "name": "b",
+     "x": 3,
+     "y": 4,
+     "service": 0
+    },
+    {
+     "name": "c",
+     "x": 0,
+     "y": 4,
+     "service": 0
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 28.0,
+   "feasible": true
+  }
+ },
+ {
+  "id": "crafted-matrix-oneway",
+  "raw": {
+   "mode": "matrix",
+   "depart": "09:00",
+   "returnHome": true,
+   "stops": [
+    {
+     "name": "A",
+     "service": 5
+    },
+    {
+     "name": "B",
+     "service": 5
+    },
+    {
+     "name": "C",
+     "service": 5
+    }
+   ],
+   "matrix": [
+    [
+     0,
+     10,
+     40,
+     12
+    ],
+    [
+     50,
+     0,
+     8,
+     20
+    ],
+    [
+     9,
+     7,
+     0,
+     15
+    ],
+    [
+     11,
+     19,
+     6,
+     0
+    ]
+   ]
+  },
+  "expected": {
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 44.0,
+   "feasible": true
+  }
+ },
+ {
+  "id": "crafted-matrix-window",
+  "raw": {
+   "mode": "matrix",
+   "depart": "13:00",
+   "returnHome": false,
+   "stops": [
+    {
+     "name": "A",
+     "service": 10,
+     "latest": "14:00"
+    },
+    {
+     "name": "B",
+     "service": 10
+    },
+    {
+     "name": "C",
+     "service": 10
+    },
+    {
+     "name": "D",
+     "service": 10,
+     "earliest": "15:00"
+    }
+   ],
+   "matrix": [
+    [
+     0,
+     20,
+     15,
+     25,
+     30
+    ],
+    [
+     22,
+     0,
+     12,
+     18,
+     10
+    ],
+    [
+     14,
+     11,
+     0,
+     9,
+     16
+    ],
+    [
+     26,
+     17,
+     8,
+     0,
+     12
+    ],
+    [
+     28,
+     9,
+     15,
+     13,
+     0
+    ]
+   ]
+  },
+  "expected": {
+   "order": [
+    1,
+    0,
+    3,
+    2
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 49.0,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-00-n2",
+  "raw": {
+   "mode": "grid",
+   "depart": "07:00",
+   "home": {
+    "x": -0.152,
+    "y": 2.965
+   },
+   "circuity": 1.42,
+   "speedMph": 15,
+   "returnHome": false,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": -4.345,
+     "y": 5.221,
+     "service": 5,
+     "latest": "12:30"
+    },
+    {
+     "name": "stop2",
+     "x": 5.838,
+     "y": -5.946,
+     "service": 30
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    0,
+    1
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 112.88511662569361,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-01-n3",
+  "raw": {
+   "mode": "grid",
+   "depart": "07:00",
+   "home": {
+    "x": -2.76,
+    "y": 2.929
+   },
+   "circuity": 1.42,
+   "speedMph": 15,
+   "returnHome": true,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": -6.084,
+     "y": 7.942,
+     "service": 10,
+     "latest": "16:15"
+    },
+    {
+     "name": "stop2",
+     "x": 7.755,
+     "y": 1.604,
+     "service": 10,
+     "latest": "16:30"
+    },
+    {
+     "name": "stop3",
+     "x": 3.85,
+     "y": 2.538,
+     "service": 10
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    0,
+    1,
+    2
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 181.03815571954055,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-02-n4",
+  "raw": {
+   "mode": "grid",
+   "depart": "09:00",
+   "home": {
+    "x": 2.809,
+    "y": -1.319
+   },
+   "circuity": 1.3,
+   "speedMph": 30,
+   "returnHome": false,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": 2.227,
+     "y": -3.379,
+     "service": 15
+    },
+    {
+     "name": "stop2",
+     "x": -7.193,
+     "y": -0.63,
+     "service": 30
+    },
+    {
+     "name": "stop3",
+     "x": 0.051,
+     "y": 6.615,
+     "service": 10,
+     "latest": "19:45"
+    },
+    {
+     "name": "stop4",
+     "x": 2.063,
+     "y": -5.797,
+     "service": 5
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    0,
+    3,
+    1,
+    2
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 66.06600174750866,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-03-n5",
+  "raw": {
+   "mode": "grid",
+   "depart": "07:00",
+   "home": {
+    "x": 1.381,
+    "y": -2.179
+   },
+   "circuity": 1.42,
+   "speedMph": 15,
+   "returnHome": false,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": 4.522,
+     "y": -2.482,
+     "service": 45
+    },
+    {
+     "name": "stop2",
+     "x": -4.281,
+     "y": -0.411,
+     "service": 15
+    },
+    {
+     "name": "stop3",
+     "x": -1.347,
+     "y": 0.89,
+     "service": 5,
+     "latest": "13:30"
+    },
+    {
+     "name": "stop4",
+     "x": 0.63,
+     "y": -0.131,
+     "service": 30,
+     "latest": "15:30"
+    },
+    {
+     "name": "stop5",
+     "x": -7.909,
+     "y": 7.296,
+     "service": 30,
+     "latest": "11:15"
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    0,
+    3,
+    2,
+    1,
+    4
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 123.00244662360855,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-04-n5",
+  "raw": {
+   "mode": "grid",
+   "depart": "10:15",
+   "home": {
+    "x": 1.346,
+    "y": 0.575
+   },
+   "circuity": 1.0,
+   "speedMph": 22,
+   "returnHome": true,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": 0.117,
+     "y": 5.637,
+     "service": 20
+    },
+    {
+     "name": "stop2",
+     "x": -2.238,
+     "y": 0.159,
+     "service": 5,
+     "latest": "17:00"
+    },
+    {
+     "name": "stop3",
+     "x": -7.5,
+     "y": -5.3,
+     "service": 30,
+     "latest": "12:00"
+    },
+    {
+     "name": "stop4",
+     "x": 6.728,
+     "y": -5.735,
+     "service": 20,
+     "earliest": "09:00",
+     "latest": "18:00"
+    },
+    {
+     "name": "stop5",
+     "x": -7.015,
+     "y": -6.455,
+     "service": 30,
+     "earliest": "09:00",
+     "latest": "19:30"
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    0,
+    1,
+    2,
+    4,
+    3
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 114.71461971790889,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-05-n6",
+  "raw": {
+   "mode": "grid",
+   "depart": "08:30",
+   "home": {
+    "x": -2.062,
+    "y": 1.073
+   },
+   "circuity": 1.3,
+   "speedMph": 22,
+   "returnHome": true,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": 3.658,
+     "y": -4.699,
+     "service": 45,
+     "latest": "17:45"
+    },
+    {
+     "name": "stop2",
+     "x": -3.786,
+     "y": 2.64,
+     "service": 20,
+     "earliest": "10:30",
+     "latest": "14:00"
+    },
+    {
+     "name": "stop3",
+     "x": 3.395,
+     "y": 2.612,
+     "service": 10,
+     "latest": "19:45"
+    },
+    {
+     "name": "stop4",
+     "x": -7.071,
+     "y": -6.642,
+     "service": 10,
+     "latest": "15:30"
+    },
+    {
+     "name": "stop5",
+     "x": -5.21,
+     "y": -4.238,
+     "service": 10,
+     "latest": "11:30"
+    },
+    {
+     "name": "stop6",
+     "x": -4.966,
+     "y": -1.884,
+     "service": 45
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    2,
+    0,
+    3,
+    4,
+    5,
+    1
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 128.7034416543716,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-06-n6",
+  "raw": {
+   "mode": "grid",
+   "depart": "11:45",
+   "home": {
+    "x": -1.794,
+    "y": -0.079
+   },
+   "circuity": 1.0,
+   "speedMph": 30,
+   "returnHome": false,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": -4.691,
+     "y": -5.193,
+     "service": 10
+    },
+    {
+     "name": "stop2",
+     "x": -0.076,
+     "y": -5.091,
+     "service": 15
+    },
+    {
+     "name": "stop3",
+     "x": 5.345,
+     "y": 0.769,
+     "service": 15
+    },
+    {
+     "name": "stop4",
+     "x": 4.549,
+     "y": -6.087,
+     "service": 10,
+     "latest": "17:30"
+    },
+    {
+     "name": "stop5",
+     "x": 4.742,
+     "y": -4.933,
+     "service": 5,
+     "earliest": "11:00",
+     "latest": "16:00"
+    },
+    {
+     "name": "stop6",
+     "x": -6.25,
+     "y": -7.09,
+     "service": 10,
+     "latest": "11:30"
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    5,
+    0,
+    1,
+    3,
+    4,
+    2
+   ],
+   "totalLate": 31.614458402247124,
+   "totalDrive": 54.02725969961959,
+   "feasible": false
+  }
+ },
+ {
+  "id": "rand-07-n6",
+  "raw": {
+   "mode": "grid",
+   "depart": "08:00",
+   "home": {
+    "x": -0.139,
+    "y": -1.274
+   },
+   "circuity": 1.0,
+   "speedMph": 15,
+   "returnHome": true,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": -1.897,
+     "y": -6.842,
+     "service": 20
+    },
+    {
+     "name": "stop2",
+     "x": -0.483,
+     "y": 6.479,
+     "service": 10,
+     "latest": "19:45"
+    },
+    {
+     "name": "stop3",
+     "x": 0.402,
+     "y": -0.406,
+     "service": 45
+    },
+    {
+     "name": "stop4",
+     "x": 3.072,
+     "y": -0.014,
+     "service": 15
+    },
+    {
+     "name": "stop5",
+     "x": -0.534,
+     "y": 2.792,
+     "service": 45,
+     "latest": "13:45"
+    },
+    {
+     "name": "stop6",
+     "x": -1.008,
+     "y": 0.816,
+     "service": 20
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    0,
+    3,
+    1,
+    4,
+    5,
+    2
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 121.17666252087591,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-08-n7",
+  "raw": {
+   "mode": "grid",
+   "depart": "10:00",
+   "home": {
+    "x": -1.299,
+    "y": 0.811
+   },
+   "circuity": 1.0,
+   "speedMph": 15,
+   "returnHome": false,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": 3.447,
+     "y": -5.19,
+     "service": 15
+    },
+    {
+     "name": "stop2",
+     "x": 2.643,
+     "y": 1.425,
+     "service": 5
+    },
+    {
+     "name": "stop3",
+     "x": -3.586,
+     "y": -6.978,
+     "service": 15,
+     "earliest": "08:30",
+     "latest": "19:00"
+    },
+    {
+     "name": "stop4",
+     "x": 7.198,
+     "y": 0.021,
+     "service": 30
+    },
+    {
+     "name": "stop5",
+     "x": -1.533,
+     "y": 2.191,
+     "service": 5,
+     "earliest": "11:30",
+     "latest": "15:00"
+    },
+    {
+     "name": "stop6",
+     "x": -2.186,
+     "y": -6.051,
+     "service": 30
+    },
+    {
+     "name": "stop7",
+     "x": -3.057,
+     "y": 3.559,
+     "service": 15
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    4,
+    6,
+    1,
+    3,
+    0,
+    5,
+    2
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 112.39443773038154,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-09-n7",
+  "raw": {
+   "mode": "grid",
+   "depart": "11:00",
+   "home": {
+    "x": -2.877,
+    "y": -0.903
+   },
+   "circuity": 1.42,
+   "speedMph": 30,
+   "returnHome": true,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": -2.95,
+     "y": 4.46,
+     "service": 30,
+     "latest": "13:00"
+    },
+    {
+     "name": "stop2",
+     "x": 1.37,
+     "y": -1.0,
+     "service": 15
+    },
+    {
+     "name": "stop3",
+     "x": -3.744,
+     "y": 3.742,
+     "service": 5
+    },
+    {
+     "name": "stop4",
+     "x": 6.618,
+     "y": -7.871,
+     "service": 5
+    },
+    {
+     "name": "stop5",
+     "x": -5.884,
+     "y": 6.36,
+     "service": 20
+    },
+    {
+     "name": "stop6",
+     "x": -5.163,
+     "y": 1.733,
+     "service": 20
+    },
+    {
+     "name": "stop7",
+     "x": -5.455,
+     "y": 1.021,
+     "service": 45
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    3,
+    1,
+    0,
+    2,
+    4,
+    5,
+    6
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 115.03914037824502,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-10-n7",
+  "raw": {
+   "mode": "grid",
+   "depart": "11:00",
+   "home": {
+    "x": 0.623,
+    "y": -0.201
+   },
+   "circuity": 1.3,
+   "speedMph": 15,
+   "returnHome": false,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": 0.51,
+     "y": 1.861,
+     "service": 10,
+     "latest": "17:45"
+    },
+    {
+     "name": "stop2",
+     "x": -2.233,
+     "y": -6.735,
+     "service": 45
+    },
+    {
+     "name": "stop3",
+     "x": 0.054,
+     "y": -1.596,
+     "service": 10,
+     "latest": "12:15"
+    },
+    {
+     "name": "stop4",
+     "x": 6.163,
+     "y": 7.919,
+     "service": 5,
+     "earliest": "11:00",
+     "latest": "18:00"
+    },
+    {
+     "name": "stop5",
+     "x": 4.16,
+     "y": -7.881,
+     "service": 30,
+     "earliest": "09:00",
+     "latest": "20:00"
+    },
+    {
+     "name": "stop6",
+     "x": 5.933,
+     "y": 5.615,
+     "service": 15,
+     "latest": "17:30"
+    },
+    {
+     "name": "stop7",
+     "x": -3.609,
+     "y": 6.797,
+     "service": 15
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    2,
+    1,
+    4,
+    0,
+    6,
+    5,
+    3
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 220.4226125028412,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-11-n8",
+  "raw": {
+   "mode": "grid",
+   "depart": "11:00",
+   "home": {
+    "x": -1.932,
+    "y": -1.547
+   },
+   "circuity": 1.3,
+   "speedMph": 15,
+   "returnHome": false,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": 6.477,
+     "y": 1.529,
+     "service": 5
+    },
+    {
+     "name": "stop2",
+     "x": -4.725,
+     "y": 1.708,
+     "service": 5,
+     "earliest": "11:30",
+     "latest": "18:30"
+    },
+    {
+     "name": "stop3",
+     "x": -6.731,
+     "y": -4.648,
+     "service": 30,
+     "latest": "11:45"
+    },
+    {
+     "name": "stop4",
+     "x": 2.938,
+     "y": 5.706,
+     "service": 5
+    },
+    {
+     "name": "stop5",
+     "x": 3.056,
+     "y": -3.485,
+     "service": 5
+    },
+    {
+     "name": "stop6",
+     "x": -3.484,
+     "y": 6.379,
+     "service": 30,
+     "latest": "11:15"
+    },
+    {
+     "name": "stop7",
+     "x": -3.255,
+     "y": -2.393,
+     "service": 30,
+     "latest": "11:00"
+    },
+    {
+     "name": "stop8",
+     "x": 7.163,
+     "y": 0.464,
+     "service": 30,
+     "latest": "14:15"
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    6,
+    2,
+    5,
+    7,
+    0,
+    3,
+    1,
+    4
+   ],
+   "totalLate": 205.1841434613201,
+   "totalDrive": 281.4658351017704,
+   "feasible": false
+  }
+ },
+ {
+  "id": "rand-12-n8",
+  "raw": {
+   "mode": "grid",
+   "depart": "07:45",
+   "home": {
+    "x": -2.331,
+    "y": -0.684
+   },
+   "circuity": 1.3,
+   "speedMph": 30,
+   "returnHome": true,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": -4.04,
+     "y": -0.035,
+     "service": 5
+    },
+    {
+     "name": "stop2",
+     "x": 0.955,
+     "y": -1.322,
+     "service": 45,
+     "earliest": "09:00",
+     "latest": "18:30"
+    },
+    {
+     "name": "stop3",
+     "x": -7.258,
+     "y": -2.048,
+     "service": 30,
+     "latest": "11:30"
+    },
+    {
+     "name": "stop4",
+     "x": -0.757,
+     "y": 2.902,
+     "service": 5,
+     "latest": "18:45"
+    },
+    {
+     "name": "stop5",
+     "x": 2.963,
+     "y": -2.086,
+     "service": 20
+    },
+    {
+     "name": "stop6",
+     "x": 4.83,
+     "y": 7.56,
+     "service": 15
+    },
+    {
+     "name": "stop7",
+     "x": -3.995,
+     "y": 5.899,
+     "service": 10
+    },
+    {
+     "name": "stop8",
+     "x": -3.349,
+     "y": -4.554,
+     "service": 15
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    0,
+    2,
+    7,
+    1,
+    4,
+    5,
+    6,
+    3
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 116.82131928965336,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-13-n8",
+  "raw": {
+   "mode": "grid",
+   "depart": "08:15",
+   "home": {
+    "x": 1.458,
+    "y": -1.293
+   },
+   "circuity": 1.42,
+   "speedMph": 15,
+   "returnHome": true,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": 2.362,
+     "y": -6.107,
+     "service": 20
+    },
+    {
+     "name": "stop2",
+     "x": 7.13,
+     "y": 1.03,
+     "service": 5,
+     "latest": "18:45"
+    },
+    {
+     "name": "stop3",
+     "x": 7.689,
+     "y": -4.555,
+     "service": 5
+    },
+    {
+     "name": "stop4",
+     "x": 1.315,
+     "y": -1.296,
+     "service": 20
+    },
+    {
+     "name": "stop5",
+     "x": -0.699,
+     "y": 6.687,
+     "service": 15,
+     "latest": "13:30"
+    },
+    {
+     "name": "stop6",
+     "x": -2.644,
+     "y": -4.686,
+     "service": 45,
+     "latest": "16:30"
+    },
+    {
+     "name": "stop7",
+     "x": -0.184,
+     "y": -7.655,
+     "service": 20,
+     "latest": "15:45"
+    },
+    {
+     "name": "stop8",
+     "x": 6.115,
+     "y": 0.513,
+     "service": 5,
+     "earliest": "11:30",
+     "latest": "14:30"
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    3,
+    5,
+    6,
+    0,
+    2,
+    1,
+    7,
+    4
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 238.2896005540566,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-14-n8",
+  "raw": {
+   "mode": "grid",
+   "depart": "09:45",
+   "home": {
+    "x": 2.718,
+    "y": -0.42
+   },
+   "circuity": 1.3,
+   "speedMph": 30,
+   "returnHome": true,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": -2.831,
+     "y": -5.151,
+     "service": 45,
+     "latest": "13:00"
+    },
+    {
+     "name": "stop2",
+     "x": -0.572,
+     "y": -6.623,
+     "service": 5
+    },
+    {
+     "name": "stop3",
+     "x": -6.882,
+     "y": -3.758,
+     "service": 10
+    },
+    {
+     "name": "stop4",
+     "x": -6.402,
+     "y": -4.582,
+     "service": 20
+    },
+    {
+     "name": "stop5",
+     "x": -0.126,
+     "y": -6.429,
+     "service": 20
+    },
+    {
+     "name": "stop6",
+     "x": 3.224,
+     "y": -1.133,
+     "service": 30,
+     "earliest": "10:00",
+     "latest": "17:30"
+    },
+    {
+     "name": "stop7",
+     "x": -0.665,
+     "y": 4.747,
+     "service": 30
+    },
+    {
+     "name": "stop8",
+     "x": 7.629,
+     "y": -6.211,
+     "service": 5
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    5,
+    7,
+    4,
+    1,
+    0,
+    3,
+    2,
+    6
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 103.52675376421556,
+   "feasible": true
+  }
+ },
+ {
+  "id": "rand-15-n8",
+  "raw": {
+   "mode": "grid",
+   "depart": "10:00",
+   "home": {
+    "x": -1.885,
+    "y": 0.393
+   },
+   "circuity": 1.3,
+   "speedMph": 22,
+   "returnHome": true,
+   "stops": [
+    {
+     "name": "stop1",
+     "x": -2.055,
+     "y": -2.47,
+     "service": 30,
+     "earliest": "09:30",
+     "latest": "15:00"
+    },
+    {
+     "name": "stop2",
+     "x": -1.146,
+     "y": -0.81,
+     "service": 10
+    },
+    {
+     "name": "stop3",
+     "x": 1.741,
+     "y": 6.762,
+     "service": 20
+    },
+    {
+     "name": "stop4",
+     "x": 4.708,
+     "y": -4.529,
+     "service": 30,
+     "latest": "11:15"
+    },
+    {
+     "name": "stop5",
+     "x": 1.845,
+     "y": 7.133,
+     "service": 30
+    },
+    {
+     "name": "stop6",
+     "x": -7.225,
+     "y": 3.976,
+     "service": 30,
+     "latest": "18:30"
+    },
+    {
+     "name": "stop7",
+     "x": 2.165,
+     "y": 0.43,
+     "service": 45
+    },
+    {
+     "name": "stop8",
+     "x": -1.417,
+     "y": -0.836,
+     "service": 45,
+     "latest": "17:30"
+    }
+   ]
+  },
+  "expected": {
+   "order": [
+    0,
+    3,
+    6,
+    2,
+    4,
+    5,
+    7,
+    1
+   ],
+   "totalLate": 0.0,
+   "totalDrive": 145.61990139912083,
+   "feasible": true
+  }
+ }
+   ]
